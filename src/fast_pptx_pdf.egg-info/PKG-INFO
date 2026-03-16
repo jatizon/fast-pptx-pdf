@@ -1,0 +1,95 @@
+Metadata-Version: 2.4
+Name: fast-pptx-pdf
+Version: 0.1.0
+Summary: Convert PPTX to PDF using LibreOffice headless mode with safe parallel conversion
+Author: fast-pptx-pdf contributors
+License: MIT
+Keywords: pptx,pdf,libreoffice,conversion,parallel
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Office/Business
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: dev
+Requires-Dist: pytest>=7; extra == "dev"
+Requires-Dist: pytest-cov; extra == "dev"
+Dynamic: license-file
+
+# fast-pptx-pdf
+
+Convert PPTX files to PDF using LibreOffice in headless mode, with **safe parallel conversion** via per-worker profiles.
+
+- **Simple API**: `convert_file(path)` and `convert_folder(path, workers=8)`.
+- **CLI**: `fast-pptx-pdf file.pptx` or `fast-pptx-pdf folder/ --workers 8`.
+- **No profile locking**: Each worker uses its own LibreOffice profile in a temp directory.
+- **Robust**: Timeouts, optional retries, and clear errors.
+
+Python cannot natively render PowerPoint files; this library uses the LibreOffice command-line interface. COM automation (Windows) is not thread-safe; LibreOffice headless runs one process per conversion and is suitable for parallelism when each process has a separate profile.
+
+## Requirements
+
+- **Python** 3.8+
+- **LibreOffice** installed and on `PATH`, or set `FAST_PPTX_PDF_LIBREOFFICE` to the path to `soffice` (or its `program` directory).
+
+### Installing LibreOffice
+
+- **Windows**: [Download](https://www.libreoffice.org/download/download/) the installer, or use `winget install TheDocumentFoundation.LibreOffice`.
+- **Linux**: e.g. `sudo apt install libreoffice` (Debian/Ubuntu) or your distribution’s package.
+
+## Install
+
+```bash
+pip install fast-pptx-pdf
+```
+
+## Usage
+
+### Python API
+
+```python
+from fast_pptx_pdf import convert_file, convert_folder
+
+# Single file (output PDF next to the PPTX by default)
+pdf_path = convert_file("slides/presentation.pptx")
+# Optional: output directory, timeout, retries
+pdf_path = convert_file("deck.pptx", output_dir="pdfs/", timeout=60, retries=1)
+
+# Folder: convert all .pptx in parallel (workers default: min(cpu_count, number of files))
+successes, failures = convert_folder("slides/")
+successes, failures = convert_folder("slides/", workers=8, continue_on_error=True)
+```
+
+### CLI
+
+```bash
+# Single file
+fast-pptx-pdf presentation.pptx
+
+# Folder (default workers)
+fast-pptx-pdf slides/
+
+# Folder with 8 workers
+fast-pptx-pdf slides/ --workers 8
+
+# Optional: timeout, retries, LibreOffice path, continue on error
+fast-pptx-pdf slides/ --workers 4 --timeout 60 --retries 1 --continue-on-error
+fast-pptx-pdf file.pptx --libreoffice "C:\Program Files\LibreOffice\program\soffice.exe"
+```
+
+## Configuration
+
+- **LibreOffice path**: Set the environment variable `FAST_PPTX_PDF_LIBREOFFICE` to the full path to `soffice` or to the LibreOffice `program` directory. The library also searches `PATH` and common install locations (e.g. Windows `Program Files`, Linux `/usr/bin/soffice`).
+- **Workers**: For `convert_folder`, if `workers` is not set, it uses `min(cpu_count, number_of_pptx_files)`.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

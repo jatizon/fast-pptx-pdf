@@ -1,0 +1,2 @@
+[console_scripts]
+fast-pptx-pdf = fast_pptx_pdf.cli:main
