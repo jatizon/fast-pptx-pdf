@@ -7,7 +7,7 @@ name = "fast-pptx-pdf"
 version = "0.1.0"
 description = "Convert PPTX to PDF using LibreOffice headless mode with safe parallel conversion"
 readme = "README.md"
-license = "MIT"
+license = { text = "MIT" }
 requires-python = ">=3.8"
 authors = [{ name = "fast-pptx-pdf contributors" }]
 keywords = ["pptx", "pdf", "libreoffice", "conversion", "parallel"]
