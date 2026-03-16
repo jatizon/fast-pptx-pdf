@@ -1,11 +1,13 @@
 """Run soffice with timeout and optional retries."""
 
 import subprocess
+from typing import List, Optional
+
 from fast_pptx_pdf.exceptions import ConversionError, ConversionTimeoutError
 
 
 def run_soffice(
-    cmd: list[str],
+    cmd: List[str],
     *,
     timeout: float = 120.0,
     retries: int = 0,
@@ -22,9 +24,9 @@ def run_soffice(
         ConversionTimeoutError: If the process does not complete within timeout.
         ConversionError: If the process exits with a non-zero code.
     """
-    last_timeout: float | None = None
-    last_stderr: str | None = None
-    last_exit_code: int | None = None
+    last_timeout: Optional[float] = None
+    last_stderr: Optional[str] = None
+    last_exit_code: Optional[int] = None
 
     for attempt in range(retries + 1):
         try:

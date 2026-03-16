@@ -4,11 +4,12 @@ import os
 import glob
 import shutil
 from pathlib import Path
+from typing import Optional
 
 from fast_pptx_pdf.exceptions import LibreOfficeNotFoundError
 
 
-def find_libreoffice(path_override: str | None = None) -> str:
+def find_libreoffice(path_override: Optional[str] = None) -> str:
     """
     Locate the LibreOffice soffice executable.
 

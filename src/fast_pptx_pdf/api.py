@@ -2,6 +2,7 @@
 
 import os
 from pathlib import Path
+from typing import List, Optional, Set, Tuple, Union
 
 from fast_pptx_pdf.converter import convert_one
 from fast_pptx_pdf.profiles import temporary_profile
@@ -9,10 +10,10 @@ from fast_pptx_pdf.pool import convert_folder_parallel
 
 
 def convert_file(
-    path: str | Path,
+    path: Union[str, Path],
     *,
-    output_dir: str | Path | None = None,
-    libreoffice_path: str | None = None,
+    output_dir: Optional[Union[str, Path]] = None,
+    libreoffice_path: Optional[str] = None,
     timeout: float = 120.0,
     retries: int = 0,
 ) -> Path:
@@ -42,15 +43,15 @@ def convert_file(
 
 
 def convert_folder(
-    path: str | Path,
+    path: Union[str, Path],
     *,
-    output_dir: str | Path | None = None,
-    workers: int | None = None,
-    libreoffice_path: str | None = None,
+    output_dir: Optional[Union[str, Path]] = None,
+    workers: Optional[int] = None,
+    libreoffice_path: Optional[str] = None,
     timeout: float = 120.0,
     retries: int = 0,
     continue_on_error: bool = False,
-) -> tuple[list[Path], list[tuple[Path, Exception]]]:
+) -> Tuple[List[Path], List[Tuple[Path, Exception]]]:
     """
     Convert all PPTX files in a folder to PDF in parallel.
 
@@ -73,7 +74,7 @@ def convert_folder(
         raise NotADirectoryError(f"Not a directory: {folder}")
 
     all_pptx = sorted(folder.glob("*.pptx")) + sorted(folder.glob("*.PPTX"))
-    seen: set[Path] = set()
+    seen: Set[Path] = set()
     pptx_paths = []
     for p in all_pptx:
         r = p.resolve()

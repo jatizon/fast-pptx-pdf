@@ -5,7 +5,7 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Optional
 
 
 class ProfileManager:
@@ -20,7 +20,7 @@ class ProfileManager:
         if num_profiles < 1:
             raise ValueError("num_profiles must be at least 1")
         self._num_profiles = num_profiles
-        self._root: Path | None = None
+        self._root: Optional[Path] = None
         self._created = False
 
     def create(self) -> None:

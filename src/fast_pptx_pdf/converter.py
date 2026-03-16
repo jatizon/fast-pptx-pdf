@@ -1,17 +1,18 @@
 """Single-file PPTX to PDF conversion via LibreOffice headless."""
 
 from pathlib import Path
+from typing import Optional, Union
 
 from fast_pptx_pdf.libreoffice import find_libreoffice
 from fast_pptx_pdf.process import run_soffice
 
 
 def convert_one(
-    pptx_path: str | Path,
+    pptx_path: Union[str, Path],
     *,
-    output_dir: str | Path | None = None,
-    libreoffice_path: str | None = None,
-    profile_url: str | None = None,
+    output_dir: Optional[Union[str, Path]] = None,
+    libreoffice_path: Optional[str] = None,
+    profile_url: Optional[str] = None,
     timeout: float = 120.0,
     retries: int = 0,
 ) -> Path:

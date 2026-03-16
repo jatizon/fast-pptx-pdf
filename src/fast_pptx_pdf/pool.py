@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import List, Optional, Tuple, Union
 
 from fast_pptx_pdf.converter import convert_one
 from fast_pptx_pdf.libreoffice import find_libreoffice
@@ -12,11 +13,11 @@ from fast_pptx_pdf.profiles import ProfileManager
 def _convert_task(
     pptx_path: str,
     profile_url: str,
-    libreoffice_path: str | None,
-    output_dir: str | None,
+    libreoffice_path: Optional[str],
+    output_dir: Optional[str],
     timeout: float,
     retries: int,
-) -> tuple[str, Path | Exception]:
+) -> Tuple[str, Union[Path, Exception]]:
     """
     Run in a worker process: convert one file with the given profile.
     Returns (pptx_path, output_path or exception).
@@ -36,15 +37,15 @@ def _convert_task(
 
 
 def convert_folder_parallel(
-    pptx_paths: list[Path],
+    pptx_paths: List[Path],
     workers: int,
     *,
-    output_dir: str | Path | None = None,
-    libreoffice_path: str | None = None,
+    output_dir: Optional[Union[str, Path]] = None,
+    libreoffice_path: Optional[str] = None,
     timeout: float = 120.0,
     retries: int = 0,
     continue_on_error: bool = False,
-) -> tuple[list[Path], list[tuple[Path, Exception]]]:
+) -> Tuple[List[Path], List[Tuple[Path, Exception]]]:
     """
     Convert multiple PPTX files in parallel, each worker using its own profile.
 
@@ -69,7 +70,7 @@ def convert_folder_parallel(
     n = min(workers, len(pptx_paths))
     str_paths = [str(p) for p in pptx_paths]
 
-    out_dir_str: str | None = str(output_dir) if output_dir is not None else None
+    out_dir_str: Optional[str] = str(output_dir) if output_dir is not None else None
 
     with ProfileManager(n) as profiles:
         profile_urls = [profiles.get_profile_url(i) for i in range(n)]
@@ -78,9 +79,9 @@ def convert_folder_parallel(
             for i, path in enumerate(str_paths)
         ]
 
-        successes: list[Path] = []
-        failures: list[tuple[Path, Exception]] = []
-        first_error: Exception | None = None
+        successes: List[Path] = []
+        failures: List[Tuple[Path, Exception]] = []
+        first_error: Optional[Exception] = None
 
         with ProcessPoolExecutor(max_workers=n) as executor:
             future_to_path = {
