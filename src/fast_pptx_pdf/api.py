@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-from typing import List, Optional, Set, Tuple, Union
+from typing import Callable, List, Optional, Set, Tuple, Union
 
 from fast_pptx_pdf.converter import convert_one
 from fast_pptx_pdf.profiles import temporary_profile
@@ -51,6 +51,8 @@ def convert_folder(
     timeout: float = 120.0,
     retries: int = 0,
     continue_on_error: bool = False,
+    show_progress: bool = False,
+    progress_callback: Optional[Callable[[Path], None]] = None,
 ) -> Tuple[List[Path], List[Tuple[Path, Exception]]]:
     """
     Convert all PPTX files in a folder to PDF in parallel.
@@ -63,6 +65,9 @@ def convert_folder(
         timeout: Max seconds per conversion.
         retries: Retries per conversion.
         continue_on_error: If False, raise on first failure. If True, return successes and failures.
+        show_progress: If True, show a progress bar using tqdm (if installed).
+        progress_callback: Optional callback called with each PPTX Path after it finishes
+            (success or failure).
 
     Returns:
         (success_list, failure_list). success_list is list of output PDF paths;
@@ -97,4 +102,6 @@ def convert_folder(
         timeout=timeout,
         retries=retries,
         continue_on_error=continue_on_error,
+        show_progress=show_progress,
+        progress_callback=progress_callback,
     )

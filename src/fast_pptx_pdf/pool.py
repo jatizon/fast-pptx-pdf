@@ -3,7 +3,7 @@
 import os
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import List, Optional, Tuple, Union
+from typing import Callable, List, Optional, Tuple, Union
 
 from fast_pptx_pdf.converter import convert_one
 from fast_pptx_pdf.libreoffice import find_libreoffice
@@ -45,6 +45,8 @@ def convert_folder_parallel(
     timeout: float = 120.0,
     retries: int = 0,
     continue_on_error: bool = False,
+    show_progress: bool = False,
+    progress_callback: Optional[Callable[[Path], None]] = None,
 ) -> Tuple[List[Path], List[Tuple[Path, Exception]]]:
     """
     Convert multiple PPTX files in parallel, each worker using its own profile.
@@ -96,7 +98,22 @@ def convert_folder_parallel(
                 ): path
                 for path, url in tasks
             }
-            for future in as_completed(future_to_path):
+
+            iterator = as_completed(future_to_path)
+            if show_progress:
+                try:
+                    from tqdm import tqdm  # type: ignore[import-not-found]
+
+                    iterator = tqdm(
+                        iterator,
+                        total=len(future_to_path),
+                        desc="Converting PPTX files",
+                    )
+                except Exception:
+                    # If tqdm is not available, silently fall back to no progress bar.
+                    pass
+
+            for future in iterator:
                 path_str = future_to_path[future]
                 path = Path(path_str)
                 try:
@@ -111,6 +128,9 @@ def convert_folder_parallel(
                     if not continue_on_error and first_error is None:
                         first_error = e
                     failures.append((path, e))
+
+                if progress_callback is not None:
+                    progress_callback(path)
 
         if first_error is not None and not continue_on_error:
             raise first_error
