@@ -40,6 +40,9 @@ jobs:
       - name: Install build and twine
         run: pip install build twine
 
+      - name: Clean dist
+        run: rm -rf dist
+
       - name: Build package
         run: python -m build
 
@@ -69,6 +72,9 @@ jobs:
 
       - name: Install build
         run: pip install build
+
+      - name: Clean dist
+        run: rm -rf dist
 
       - name: Build package
         run: python -m build
