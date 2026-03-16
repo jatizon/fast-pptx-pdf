@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fast-pptx-pdf"
-version = "0.1.3"
+version = "0.1.4"
 description = "Convert PPTX to PDF using LibreOffice headless mode with safe parallel conversion"
 readme = "README.md"
 license = { text = "MIT" }

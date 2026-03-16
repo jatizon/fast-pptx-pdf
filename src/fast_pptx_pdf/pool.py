@@ -99,21 +99,7 @@ def convert_folder_parallel(
                 for path, url in tasks
             }
 
-            iterator = as_completed(future_to_path)
-            if show_progress:
-                try:
-                    from tqdm import tqdm  # type: ignore[import-not-found]
-
-                    iterator = tqdm(
-                        iterator,
-                        total=len(future_to_path),
-                        desc="Converting PPTX files",
-                    )
-                except Exception:
-                    # If tqdm is not available, silently fall back to no progress bar.
-                    pass
-
-            for future in iterator:
+            for future in as_completed(future_to_path):
                 path_str = future_to_path[future]
                 path = Path(path_str)
                 try:
